@@ -12,7 +12,7 @@ the ContosoPizza name is kept on purpose because Pulse's pages and the pilot rec
 
 ## Planes and modules (Jundago platform)
 
-Every Jundago screen and route belongs to one **plane**, decided by who calls it: **staff** → `platform-admin`; **a tenant's admins and members** → their org's Command Center (`command-center`, or `devops-center` for deployments); **an agent in the customer's account** → the operator routes; **signed out** → `jun-portal`. The planes share no principal, and on-prem is the tenant plane only. The module map and the canonical table live in one place — [`jun-platform/CLAUDE.md` → "Products, planes and modules — at a glance"](https://github.com/jundago/jun-platform/blob/main/CLAUDE.md#products-planes-and-modules--at-a-glance) (authority: its ADR 0003 and ADR 0002). Do not copy it here.
+Every Jundago screen and route belongs to one **plane**, decided by who calls it: **staff** → `platform-admin`; **a tenant's admins and members** → their org's Command Center (`command-center`, or `devops-center` for deployments); **an agent in the customer's account** → the operator routes; **signed-out pages** → `jun-portal` (pre-authentication API routes stay in the product whose plane they lead into). The planes share no principal, and on-prem is the tenant plane only. The module map and the canonical table live in one place — [`jun-platform/CLAUDE.md` → "Products, planes and modules — at a glance"](https://github.com/jundago/jun-platform/blob/main/CLAUDE.md#products-planes-and-modules--at-a-glance) (authority: its ADR 0003 and ADR 0002). Do not copy it here.
 
 **This repo:** **not a platform product.** It is a sample app used to demo and validate Pulse.
 
