@@ -163,3 +163,8 @@ dotnet run --launch-profile http     # http://localhost:5176, OTLP to whatever t
 
 `ContosoPizza.http` has requests for every route. There are no tests; the sample is verified by
 installing it and comparing Pulse's pages to the agent's counters.
+
+## License
+
+MIT, see `LICENSE`. Copyright (c) 2026 API Generators INC. "Contoso" is a fictional company name
+Microsoft uses in its tutorials; no Microsoft code is included.
