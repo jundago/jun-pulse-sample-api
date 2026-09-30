@@ -23,16 +23,26 @@ runtime metrics, all exported over OTLP/HTTP. The service appears in Pulse as `C
 
 ## Point it at the agent
 
-Three standard variables, no code change. `<agent>` is the machine running the Pulse agent
-(`127.0.0.1` when it is this one); the port is the one the agent listens on (`5202` in Pulse's
-Add-collector script; the agent's built-in default is `5200`); the probe key is the one Pulse's
-Add-collector dialog generated for the site.
+**On the agent's own machine (agent 0.5.0 or newer): nothing to set.** The agent's installer sets
+`OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_EXPORTER_OTLP_PROTOCOL` machine-wide, and the agent takes
+telemetry from processes on its own machine without the probe key. Start the app from a **new**
+shell or session (a shell that was open before the agent was installed keeps its old environment;
+under IIS, recycle the application pool). Measured on the pilot server 2026-09-30: a new
+PowerShell window saw the variables at once, no sign-out or reboot.
+
+**On another machine, or when the agent was installed with `TRUSTLOOPBACK=0`, or with agent 0.4.0:**
+three standard variables, no code change. `<agent>` is the machine running the Pulse agent; the
+port is the one the agent listens on (`5202` in Pulse's Add-collector script; the agent's built-in
+default is `5200`); the probe key is the one Pulse's Add-collector dialog generated for the site.
 
 ```
 OTEL_EXPORTER_OTLP_ENDPOINT=http://<agent>:5202
 OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 OTEL_EXPORTER_OTLP_HEADERS=X-Probe-Key=<probe key>
 ```
+
+An app that sets only its own endpoint still inherits the machine-level protocol; set all three
+when you set any.
 
 ## Install on Windows Server
 
@@ -53,7 +63,9 @@ New-Website -Name ContosoPizza -Port 5176 -PhysicalPath C:\inetpub\ContosoPizza 
 ```
 
 3. Give the site the three variables. The ASP.NET Core Module reads them from `web.config`, so
-   edit `C:\inetpub\ContosoPizza\web.config` and add inside `<aspNetCore …>`:
+   with agent 0.5.0 or newer on this machine, nothing: the machine-level defaults apply to the
+   application pool after a recycle. Otherwise (another machine, `TRUSTLOOPBACK=0`, or agent
+   0.4.0) edit `C:\inetpub\ContosoPizza\web.config` and add inside `<aspNetCore …>`:
 
 ```xml
 <environmentVariables>
@@ -67,11 +79,19 @@ New-Website -Name ContosoPizza -Port 5176 -PhysicalPath C:\inetpub\ContosoPizza 
 
 ### B. From a console (a quick test, what the pilot did)
 
+On the agent's machine with agent 0.5.0 or newer, from a shell opened after the agent was installed:
+
+```powershell
+dotnet run --launch-profile http      # listens on http://localhost:5176; the machine defaults do the rest
+```
+
+Anywhere else (or with `TRUSTLOOPBACK=0`, or agent 0.4.0):
+
 ```powershell
 $env:OTEL_EXPORTER_OTLP_ENDPOINT = "http://127.0.0.1:5202"
 $env:OTEL_EXPORTER_OTLP_PROTOCOL = "http/protobuf"
 $env:OTEL_EXPORTER_OTLP_HEADERS  = "X-Probe-Key=<probe key>"
-dotnet run --launch-profile http      # listens on http://localhost:5176
+dotnet run --launch-profile http
 ```
 
 Running it as a Windows service needs `UseWindowsService()` in `Program.cs`, which the sample does
@@ -93,6 +113,8 @@ Environment=ASPNETCORE_URLS=http://0.0.0.0:5176
 Environment=OTEL_EXPORTER_OTLP_ENDPOINT=http://<agent>:5202
 Environment=OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 Environment=OTEL_EXPORTER_OTLP_HEADERS=X-Probe-Key=<probe key>
+# The three variables stay on Linux: the agent's Linux package (Phase 2) is not out yet, so the
+# agent is on another machine and the key is required.
 Restart=always
 User=www-data
 
@@ -104,6 +126,10 @@ curl -s http://localhost:5176/weatherforecast
 ```
 
 ## Drive traffic
+
+The script lives in this repo under `scripts/`; a published copy of the app on a server does not
+carry it, so clone the repo there or run the four routes inline (`/weatherforecast`,
+`/api/incidents/slow`, `/api/incidents/crash`, `/api/incidents/upstream`, 25 rounds).
 
 ```powershell
 scripts\generate-traffic.ps1                       # 25 rounds against http://127.0.0.1:5176
@@ -124,7 +150,10 @@ Each round hits the four routes, so the healthy, slow, crashing and upstream-fai
   `upstream`.
 
 If Collectors shows nothing: the agent's `/status` (`spans_received`) says whether the app reached
-it; a wrong probe key is a 401 in the agent's log.
+it, and its `intake` object says whether local senders are trusted (`trust_loopback`) and whether
+an allow-list is set (`loopback_processes`). In the agent's log, a wrong probe key is a 401
+`invalid probe key`; a local process that is not on the pushed allow-list is a 401 `local sender not
+allowed`; 429 and 403 are the per-service rate limit and the services-per-day cap.
 
 ## Development
 
