@@ -1,7 +1,6 @@
 # CLAUDE.md
 
-Guidance for Claude Code in this repository. The Core-Product `CLAUDE.md` (one level up in the local
-workspace) applies as well.
+Guidance for Claude Code in this repository.
 
 ## What this is
 
@@ -9,12 +8,8 @@ The Jundago Pulse **sample API**: a small ASP.NET Core app (.NET 10) instrumente
 OpenTelemetry SDK, used to validate a Pulse installation and to demo it. It is not product code.
 Carved out of `rootvyana/contoso-pizza-observability` (the app only, with history) on 2026-09-27;
 the ContosoPizza name is kept on purpose because Pulse's pages and the pilot record use these routes.
-
-## Planes and modules (Jundago platform)
-
-Every Jundago screen and route belongs to one **plane**, decided by who calls it: **staff** → `platform-admin`; **a tenant's admins and members** → their org's Command Center (`command-center`, or `devops-center` for deployments); **an agent in the customer's account** → the operator routes; **signed-out pages** → `jun-portal` (pre-authentication API routes stay in the product whose plane they lead into). The planes share no principal, and on-prem has no staff plane. The module map and the canonical table live in one place — [`jun-platform/CLAUDE.md` → "Products, planes and modules — at a glance"](https://github.com/jundago/jun-platform/blob/main/CLAUDE.md#products-planes-and-modules--at-a-glance) (authority: its ADR 0003, and for modules the migrator plus ADR 0002). Do not copy it here.
-
-**This repo:** **not a platform product.** It is a sample app used to demo and validate Pulse.
+It is not a Jundago product and has no place in the platform's module map: a sample app, public,
+used to demo and validate Pulse.
 
 ## Commands
 
@@ -28,7 +23,8 @@ pwsh scripts/generate-traffic.ps1     # drives the four routes
 ## Rules
 
 - **It stays a sample.** No dependency on `jun-collector` or `jun-pulse`; it reaches the agent only
-  through the three standard `OTEL_EXPORTER_*` variables. No agent code here, no Pulse code here.
+  through the standard `OTEL_EXPORTER_*` variables, whether an operator sets them per app or the
+  agent's installer sets them machine-wide (agent 0.5.0+). No agent code here, no Pulse code here.
 - **Keep the routes and their behaviour.** `weatherforecast`, `api/incidents/{slow,crash,upstream}`
   are what Pulse's pages, tests and the pilot record refer to. Add routes; do not rename or change
   what these do.
