@@ -167,4 +167,5 @@ installing it and comparing Pulse's pages to the agent's counters.
 ## License
 
 MIT, see `LICENSE`. Copyright (c) 2026 API Generators INC. "Contoso" is a fictional company name
-Microsoft uses in its tutorials; no Microsoft code is included.
+Microsoft uses in its tutorials. The WeatherForecast scaffold comes from the `dotnet new webapi`
+template (Microsoft, MIT); no other third-party code is included.
