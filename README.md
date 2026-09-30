@@ -1,4 +1,4 @@
-# ContosoPizza: the Jundago Pulse sample API
+# ContosoPizza: the Pulse sample API
 
 A small ASP.NET Core API, instrumented with the OpenTelemetry SDK, that exists to **validate a Pulse
 installation and to demo it**. Install it next to a Pulse agent, point it at the agent with three
@@ -103,7 +103,7 @@ not have yet; use IIS for anything that must survive a reboot.
 dotnet publish -c Release -o /opt/contosopizza
 sudo tee /etc/systemd/system/contosopizza.service >/dev/null <<'EOF'
 [Unit]
-Description=ContosoPizza (Jundago Pulse sample API)
+Description=ContosoPizza ( Pulse sample API)
 After=network.target
 
 [Service]
