@@ -127,6 +127,10 @@ curl -s http://localhost:5176/weatherforecast
 
 ## Drive traffic
 
+For running it on your own desk rather than installing it — two windows, the counters
+to watch, and what an empty Pulse page usually means — see
+[quick-setup.md](quick-setup.md).
+
 The script lives in this repo under `scripts/`; a published copy of the app on a server does not
 carry it, so clone the repo there or run the four routes inline (`/weatherforecast`,
 `/api/incidents/slow`, `/api/incidents/crash`, `/api/incidents/upstream`, 25 rounds).
