@@ -16,10 +16,12 @@ builder.Services.AddOpenApi();
 
 const string serviceName = "ContosoPizza";
 
-// Request-level telemetry. The eBPF sockops program sees TCP flows but cannot
-// see inside the process, so routes, status codes and latency come from here.
-// client.port is tagged on every span deliberately: it is the join key back
-// into the eBPF flow_map, whose key includes the remote port.
+// Request-level telemetry. The agent's probe reads the kernel's TCP/IP events
+// through ETW, which sees a connection but nothing inside the process, so routes,
+// status codes, exceptions and latency have to come from here.
+// client.port is tagged on every span deliberately: the probe reports the same
+// ephemeral port on its flow record, and that is what ties a request to the
+// connection it arrived over.
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(resource => resource.AddService(
         serviceName: serviceName,
@@ -40,8 +42,6 @@ builder.Services.AddOpenTelemetry()
             };
         })
         .AddHttpClientInstrumentation()
-        // Was AddConsoleExporter, which wrote to app.log. The instrumentation
-        // above is unchanged -- only the destination moved.
         .AddOtlpExporter())
     .WithMetrics(metrics => metrics
         .AddAspNetCoreInstrumentation()
