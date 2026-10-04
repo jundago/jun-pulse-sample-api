@@ -8,6 +8,19 @@ knowledge of the agent and the agent has none of it.
 Carved out of `contoso-pizza-observability` (the app only, with history) on 2026-09-27.
 The name stays: Pulse's pages and the Plan A pilot record already speak about these routes.
 
+## Where this fits
+
+**Why it exists.** To check that a Pulse install works and to demo it. Run it next to a Pulse agent
+and every Pulse page has something to show.
+
+**Where it fits.** It is a sample app, not a Jundago product. It is outside the jun-platform
+replatform and has no plane of its own. It depends on neither the agent nor Pulse.
+
+| Repo | Relationship |
+|---|---|
+| [jun-collector](https://github.com/jundago/jun-collector) | Pulse's on-prem agent. This app sends it OTLP through the standard `OTEL_EXPORTER_OTLP_*` variables, set per app or machine-wide by the agent's installer (agent 0.5.0+). |
+| [jun-pulse](https://github.com/jundago/jun-pulse) | The product whose pages show this app's four routes. No direct link: telemetry goes through the agent. |
+
 ## Routes
 
 | Route | What it does | What Pulse shows |
